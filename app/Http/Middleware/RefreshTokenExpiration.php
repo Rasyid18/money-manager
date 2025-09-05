@@ -17,7 +17,6 @@ class RefreshTokenExpiration
      */
     public function handle(Request $request, Closure $next): Response
     {
-        Log::debug('enter');
         if ($request->user() && $request->user()->currentAccessToken()) {
             $token = $request->user()->currentAccessToken();
             $token->expires_at = Carbon::now()->addDay();
