@@ -32,9 +32,7 @@ class AccountRepository implements AccountRepositoryInterface
 
     public function create(array $param): Account
     {
-        $account = $this->account->create($param);
-
-        return $this->findByID($account->id);
+        return $this->account->create($param);
     }
 
     public function update(Account $account, array $param): Account

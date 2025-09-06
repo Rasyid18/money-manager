@@ -7,7 +7,6 @@ use App\Http\Resources\AccountResource;
 use App\Repositories\Contracts\AccountRepositoryInterface;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class AccountController extends Controller
 {
@@ -41,11 +40,10 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required|string', 'parent' => 'numeric', 'starting' => 'numeric']);
+        $request->validate(['name' => 'required|string|max:255', 'parent' => 'numeric', 'starting' => 'numeric', 'notes' => 'string']);
         $user = $request->user();
 
-        $account = $this->accounts->create(['name' => $request->name, 'parent_id' => $request->parent ?? null, 'user_id' => $user->id, 'starting_balance' => $request->starting ?? 0, 'current_balance' => $request->starting ?? 0,]);
-        Log::debug(json_encode($account));
+        $account = $this->accounts->create(['name' => $request->name, 'parent_id' => $request->parent ?? null, 'starting_balance' => $request->starting ?? 0, 'current_balance' => $request->starting ?? 0, 'notes' => $request->notes ?? null, 'user_id' => $user->id]);
         return response()->json(new AccountResource($account));
     }
 
@@ -66,7 +64,7 @@ class AccountController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate(['name' => 'string', 'parent' => 'numeric', 'starting' => 'numeric']);
+        $request->validate(['name' => 'string|max:255', 'parent' => 'numeric', 'starting' => 'numeric', 'notes' => 'string']);
         $account = $this->accounts->findByID($id);
         if (!$account) return response()->json(['message' => 'Account not found'], 404);
         $this->authorize('update', $account);
@@ -75,6 +73,7 @@ class AccountController extends Controller
         if ($request->name) $param["name"] = $request->name;
         if ($request->parent) $param["parent_id"] = $request->parent;
         if ($request->starting) $param["starting_balance"] = $request->starting;
+        if ($request->notes) $param["notes"] = $request->notes;
         $account = $this->accounts->update($account, $param);
         return response()->json(new AccountResource($account));
     }
@@ -109,6 +108,6 @@ class AccountController extends Controller
         $this->authorize('forceDelete', $account);
 
         $this->accounts->forceDelete($account);
-        return response()->json(['message' => 'Account has been removed from the app']);
+        return response()->json(['message' => 'Account has been permanently removed']);
     }
 }

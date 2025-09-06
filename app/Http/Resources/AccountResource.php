@@ -4,7 +4,6 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Log;
 
 class AccountResource extends JsonResource
 {
@@ -15,12 +14,12 @@ class AccountResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        Log::debug(json_encode($this));
         return [
             'id' => $this->id,
             'name' => $this->name,
             'starting_balance' => $this->starting_balance,
             'balance' => $this->current_balance,
+            'notes' => $this->notes,
             'parent' => $this->whenLoaded('parentAccount', function () {
                 return $this->parentAccount ? [
                     'id' => $this->parentAccount->id,
