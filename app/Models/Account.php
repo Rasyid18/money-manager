@@ -11,7 +11,7 @@ class Account extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name', 'parent_id', 'user_id', 'starting_balance'];
+    protected $fillable = ['name', 'parent_id', 'starting_balance', 'notes', 'user_id'];
 
     public function user(): BelongsTo
     {
