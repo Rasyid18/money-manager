@@ -25,11 +25,13 @@ class BudgetController extends Controller
     public function index(Request $request)
     {
         $request->validate(['key' => 'string']);
+        $user = $request->user();
 
         $search = [];
         if (!$request->key) {
             $search[] = ['name', 'like', "%$request->key%"];
         }
+        $search[] = ['user_id', '=', $user->id];
 
         $budgets = $this->budgets->get($search);
         return response()->json(BudgetResource::collection($budgets));

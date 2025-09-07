@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AccountResource;
+use App\Models\Account;
 use App\Repositories\Contracts\AccountRepositoryInterface;
+use App\Rules\BelongsToUser;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
@@ -25,11 +27,13 @@ class AccountController extends Controller
     public function index(Request $request)
     {
         $request->validate(['key' => 'string']);
+        $user = $request->user();
 
         $search = [];
         if (!$request->key) {
             $search[] = ['name', 'like', "%$request->key%"];
         }
+        $search[] = ['user_id', '=', $user->id];
 
         $accounts = $this->accounts->get($search);
         return response()->json(AccountResource::collection($accounts));
@@ -40,7 +44,7 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required|string|max:255', 'parent' => 'numeric', 'starting' => 'numeric', 'notes' => 'string']);
+        $request->validate(['name' => 'required|string|max:255', 'parent' => ['numeric', 'nullable', new BelongsToUser(Account::class)], 'starting' => 'numeric', 'notes' => 'string']);
         $user = $request->user();
 
         $account = $this->accounts->create(['name' => $request->name, 'parent_id' => $request->parent ?? null, 'starting_balance' => $request->starting ?? 0, 'current_balance' => $request->starting ?? 0, 'notes' => $request->notes ?? null, 'user_id' => $user->id]);
@@ -64,7 +68,7 @@ class AccountController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate(['name' => 'string|max:255', 'parent' => 'numeric', 'starting' => 'numeric', 'notes' => 'string']);
+        $request->validate(['name' => 'string|max:255', 'parent' => ['numeric', 'nullable', new BelongsToUser(Account::class)], 'starting' => 'numeric', 'notes' => 'string']);
         $account = $this->accounts->findByID($id);
         if (!$account) return response()->json(['message' => 'Account not found'], 404);
         $this->authorize('update', $account);
