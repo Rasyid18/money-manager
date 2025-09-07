@@ -7,15 +7,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Budget extends Model
+class TransactionCategory extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name', 'amount', 'done', 'notes', 'user_id'];
+    const TYPES = ['income', 'expense'];
+
+    protected $fillable = ['name', 'parent_id', 'type', 'icon', 'color', 'sort_order', 'user_id'];
+
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function parentCategory(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id', 'id');
+    }
+    public function children(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id', 'id');
     }
 
     public function transactions(): HasMany

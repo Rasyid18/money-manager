@@ -52,4 +52,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(Account::class);
     }
+
+    public function budgets(): HasMany
+    {
+        return $this->hasMany(Budget::class);
+    }
+
+    public function transactionCategories(): HasMany
+    {
+        return $this->hasMany(TransactionCategory::class);
+    }
+
+    public function trasactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

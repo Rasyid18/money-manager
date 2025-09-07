@@ -26,4 +26,9 @@ class Account extends Model
     {
         return $this->hasMany(self::class, 'parent_id', 'id');
     }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'from_account_id', 'id');
+    }
 }
