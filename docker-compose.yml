@@ -35,17 +35,5 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  node:
-    image: node:20
-    container_name: laravel_node
-    working_dir: /var/www/html
-    volumes:
-      - .:/var/www/html
-    command: ['npm', 'run', 'dev']
-    ports:
-      - '5173:5173'
-    depends_on:
-      - app
-
 volumes:
   pgdata:

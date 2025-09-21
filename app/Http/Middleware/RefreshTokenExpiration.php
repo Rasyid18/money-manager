@@ -19,7 +19,7 @@ class RefreshTokenExpiration
     {
         if ($request->user() && $request->user()->currentAccessToken()) {
             $token = $request->user()->currentAccessToken();
-            $token->expires_at = Carbon::now()->addDay();
+            $token->expires_at = Carbon::now()->addWeek();
             $token->save();
         }
         return $next($request);
